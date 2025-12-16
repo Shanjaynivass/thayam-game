@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- ==========================================
+     1. HEAD & CONFIGURATION
+     ========================================== -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Thayam / tamil|thayam </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Roboto:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+    <!-- ==========================================
+         0. LOADING SCREEN
+         ========================================== -->
+    <div id="loading-screen">
+        <div class="loader-content">
+            <img src="assets/logo.png" alt="Thayam Logo" class="loading-logo">
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+            <p class="loading-text">Loading...</p>
+        </div>
+
+    <!-- Orientation Warning Overlay -->
+    <div id="landscape-warning">
+        <i class="fa-solid fa-mobile-screen-button fa-rotate-270"></i>
+        <p>Please Rotate Your Device to Landscape Mode</p>
+    </div>
+    </div>
+
+
+    <!-- ==========================================
+         2. GLOBAL UI CONTROLS
+         ========================================== -->
+    <!-- Game Logo -->
+
+    
+    <!-- Settings Button -->
+    <button id="settings-btn" onclick="openSettings()">
+        <i class="fa-solid fa-gear"></i>
+    </button>
+
+    <button id="exit-btn" onclick="confirmExit()">
+        <i class="fa-solid fa-arrow-left"></i>
+    </button>
+
+    <!-- ==========================================
+         3. MENU SYSTEM (MODALS)
+         ========================================== -->
+    
+    <!-- Settings Modal -->
+    <div id="settings-modal" style="display: none;">
+        <div class="settings-content">
+            <h2 class="local-menu-title">Settings</h2>
+
+            <!-- Profile Section -->
+            <div class="settings-section profile-section">
+                <div class="profile-info">
+                    <div class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+                    <div class="profile-text">
+                        <span id="settings-username" style="font-weight:bold;">Guest Player</span>
+                        <span id="settings-status" style="font-size:0.8rem; color:#aaa;">Offline</span>
+                    </div>
+                </div>
+                <button class="btn-login" onclick="handleLogin()" id="btn-login-action">Login</button>
+            </div>
+
+            <div class="settings-scroll-area">
+                <!-- Audio Section -->
+                <h3 class="settings-subtitle">Audio</h3>
+                
+                <div class="settings-option vertical">
+                    <div class="opt-header">
+                        <span><i class="fa-solid fa-music"></i> Music Volume</span>
+                        <span id="bgm-val">40%</span>
+                    </div>
+                    <input type="range" id="bgm-slider" min="0" max="100" value="40" class="vol-slider" oninput="updateBGMVolume(this.value)">
+                </div>
+
+                <div class="settings-option vertical">
+                    <div class="opt-header">
+                        <span><i class="fa-solid fa-volume-high"></i> SFX Volume</span>
+                        <span id="sfx-val">100%</span>
+                    </div>
+                    <input type="range" id="sfx-slider" min="0" max="100" value="100" class="vol-slider" oninput="updateSFXVolume(this.value)">
+                </div>
+
+                <!-- Preferences -->
+                <h3 class="settings-subtitle">Preferences</h3>
+                
+                <div class="settings-option">
+                    <span><i class="fa-solid fa-bell"></i> Notifications</span>
+                    <button id="notif-toggle" class="toggle-btn on" onclick="toggleNotif()">ON</button>
+                </div>
+
+
+
+                <!-- Info -->
+                <h3 class="settings-subtitle">Support</h3>
+                
+
+                
+                
+                <button class="settings-link-btn" onclick="openRuleBook()">
+                    <i class="fa-solid fa-book-open"></i> Rule Book
+                </button>
+                
+                <button class="settings-link-btn" onclick="openHelpSupport()">
+                    <i class="fa-solid fa-headset"></i> Help & Support
+                </button>
+            </div>
+
+            <button onclick="closeSettings()" class="btn-back-menu" style="margin-top: 15px;">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Rule Book Modal -->
+    <div id="rules-modal" style="display: none;">
+        <div class="rules-content">
+            <div class="rules-header">
+                <h2><i class="fa-solid fa-book"></i> Game Rules</h2>
+                <button class="close-icon" onclick="closeRuleBook()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="rules-body">
+                <div class="rule-box">
+                    <h3><i class="fa-solid fa-dice"></i> 1. Dice Mechanics & Values</h3>
+                    <ul>
+                        <li><strong>Dice Type:</strong> Two 4-sided binary dice (Faces: 1, 2, 3, 0).</li>
+                        <li><strong>Scoring:</strong> Sum of two dice. <strong>0 + 0 = 12</strong>.</li>
+                        <li><strong>Extra Turns:</strong> Roll <strong>1, 5, 6, or 12</strong> to roll again.</li>
+                        <li><strong>Turn Limit:</strong> Max <strong>5 rolls</strong> per turn to prevent loops.</li>
+                    </ul>
+                </div>
+
+                <div class="rule-box">
+                    <h3><i class="fa-solid fa-chess-pawn"></i> 2. Movement & Entry</h3>
+                    <ul>
+                        <li><strong>Entry Rule (Thayam):</strong> You must roll a <strong>1</strong> to enter the board.</li>
+                        <li><strong>Buffer System:</strong> Roll first, build a buffer, then distribute moves freely.</li>
+                        <li><strong>Safe Zones:</strong> Squares with a <strong>Star (<i class="fa-solid fa-star"></i>)</strong> are safe from capture.</li>
+                    </ul>
+                </div>
+
+                <div class="rule-box">
+                    <h3><i class="fa-solid fa-skull"></i> 3. Capturing (Vettu) & Progression</h3>
+                    <ul>
+                        <li><strong>The Cut (Vettu):</strong> Land on an opponent in a non-safe zone to send them home.</li>
+                        <li><strong>The "Lock" Rule:</strong> You <strong>MUST cut an opponent</strong> to unlock the inner "Home Run" path.</li>
+                    </ul>
+                </div>
+
+                <div class="rule-box">
+                    <h3><i class="fa-solid fa-trophy"></i> 4. Winning</h3>
+                    <ul>
+                        <li><strong>The Goal:</strong> Reach the center square, the <strong>Pazham (Fruit)</strong>.</li>
+                        <li><strong>Exact Roll:</strong> You need an exact roll to land on the center to win.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button onclick="closeRuleBook()" class="btn-primary-action">Got it!</button>
+        </div>
+    </div>
+
+    <!-- Winner Modal -->
+    <div id="winner-modal" style="display: none;">
+        <div class="winner-card">
+            <div class="winner-header">
+                <i class="fa-solid fa-crown winner-crown"></i>
+                <h2 id="winner-title">Winner!</h2>
+            </div>
+            <div class="winner-body">
+                <div class="winner-avatar" id="winner-avatar">
+                   <i class="fa-solid fa-user"></i>
+                </div>
+                <h3 id="winner-name">Player Name</h3>
+                <p>Congratulations on your victory!</p>
+            </div>
+            <div class="winner-actions">
+                <button onclick="closeWinnerModal()" class="btn-win-action btn-back"><i class="fa-solid fa-eye"></i> View Board</button>
+                <button onclick="rematchGame()" class="btn-win-action btn-rematch"><i class="fa-solid fa-rotate-right"></i> Rematch</button>
+                <button onclick="goToMainMenu()" class="btn-win-action btn-home"><i class="fa-solid fa-house"></i> Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Player Selection Modal -->
+    <div id="player-selection-modal">
+        
+        <!-- Main Menu View -->
+        <div id="main-menu-view">
+            <!-- Logo -->
+            <img src="assets/logo.png" alt="Thayam Logo" class="game-logo">
+            
+            <div class="menu-options">
+                <button onclick="document.getElementById('main-menu-view').style.display='none'; document.getElementById('local-menu-view').style.display='flex';" class="menu-btn-primary">
+                    <i class="fa-solid fa-users"></i> Local Multiplayer
+                </button>
+                <button onclick="document.getElementById('main-menu-view').style.display='none'; document.getElementById('online-menu-view').style.display='flex';" class="menu-btn-primary" style="background: #3b82f6; color: white;">
+                    <i class="fa-solid fa-globe"></i> Play with Friends
+                </button>
+                <button onclick="startGame(2, true)" class="menu-btn-secondary">
+                    <i class="fa-solid fa-robot"></i> Play vs Computer
+                </button>
+            </div>
+        </div>
+
+        <!-- Local Menu View -->
+        <div id="local-menu-view">
+            <h2 class="local-menu-title">Local Game Setup</h2>
+            <div class="local-player-options">
+                <button onclick="startGame(2)" class="btn-2p">2 Players</button>
+                <button onclick="startGame(3)" class="btn-3p">3 Players</button>
+                <button onclick="startGame(4)" class="btn-4p">4 Players</button>
+            </div>
+            
+            <button onclick="alert('Player customization coming soon!')" class="btn-edit-players">
+                <i class="fa-solid fa-pen-to-square"></i> Edit Players
+            </button>
+
+            <button onclick="document.getElementById('local-menu-view').style.display='none'; document.getElementById('main-menu-view').style.display='block';" class="btn-back-menu">
+                Back to Main Menu
+            </button>
+        </div>
+
+        <!-- Online Menu View -->
+        <div id="online-menu-view" style="display: none; flex-direction: column; align-items: center; gap: 15px; width: 100%; max-width: 400px;">
+            <h2 class="local-menu-title">Online Setup</h2>
+            
+            <input type="text" id="online-player-name" placeholder="Enter Your Name" class="menu-input">
+            
+            <div class="online-tabs">
+                <button onclick="switchOnlineTab('create')" class="tab-btn active" id="tab-create">Create Room</button>
+                <button onclick="switchOnlineTab('join')" class="tab-btn" id="tab-join">Join Room</button>
+            </div>
+
+            <!-- Create Room Section -->
+            <div id="online-create-section" style="display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;">
+                <p style="margin:0; font-weight:bold;">Select Players:</p>
+                <div class="local-player-options">
+                    <button onclick="selectOnlinePlayerCount(2, this)" class="btn-2p selected-p-count">2</button>
+                    <button onclick="selectOnlinePlayerCount(3, this)" class="btn-3p">3</button>
+                    <button onclick="selectOnlinePlayerCount(4, this)" class="btn-4p">4</button>
+                </div>
+                <button onclick="generateRoom()" class="menu-btn-primary" style="font-size: 1.2rem; padding: 10px 30px; margin-top:10px;">Generate Room</button>
+            </div>
+
+<!-- Join Room Section -->
+            <div id="online-join-section" style="display: none; flex-direction: column; align-items: center; gap: 15px; width: 100%;">
+                <input type="text" id="room-code-input" placeholder="Enter 4-Digit Room Code" class="menu-input" maxlength="4" style="text-transform: uppercase;">
+                <button onclick="joinRoom()" class="menu-btn-primary" style="font-size: 1.2rem; padding: 10px 30px;">Join Room</button>
+            </div>
+
+            <!-- Online Lobby (Hidden initially) -->
+            <div id="online-lobby" style="display: none; flex-direction: column; align-items: center; gap: 15px; width: 100%; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+                <h3 style="margin:0;">Room Code: <span id="display-room-code" style="color: #f1c40f; letter-spacing: 3px; font-size: 1.5rem;">----</span></h3>
+                <button onclick="copyRoomLink()" class="btn-edit-players" style="background:#3b82f6; border:none; color:white;"><i class="fa-solid fa-share-nodes"></i> Share Link</button>
+                <div id="connected-players-list" style="font-size: 0.9rem; color: #ccc;">Waiting for players...</div>
+                <button class="menu-btn-primary" style="font-size:1rem; padding: 8px 20px; opacity: 0.5; cursor: not-allowed;" id="btn-start-online">Start Game</button>
+            </div>
+
+            <button onclick="document.getElementById('online-menu-view').style.display='none'; document.getElementById('main-menu-view').style.display='block';" class="btn-back-menu">
+                Back to Main Menu
+            </button>
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         4. MAIN GAME LAYOUT
+         ========================================== -->
+    <div class="game-wrapper" id="game-wrapper" style="display: none;">
+        <!-- Left Panel: Blue (Top) & Green (Bottom) -->
+        <div class="side-panel left-panel">
+            <!-- Player 2: Blue -->
+            <div class="player-card card-blue" id="p2-card">
+                <div class="player-header">
+                    <div class="player-avatar" style="background: #0099ff;"></div>
+                    <span>Blue Player</span>
+                    <span class="kill-indicator" id="p2-kill"
+                        style="display:none; color: #ffeb3b; margin-left: auto;"><i
+                            class="fa-solid fa-skull-crossbones"></i></span>
+                </div>
+                <div class="player-dice-area">
+                    <div class="mini-dice" id="p2-d1">?</div>
+                    <div class="mini-dice" id="p2-d2">?</div>
+                </div>
+                <div class="roll-buffer" id="p2-buffer">
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                </div>
+                <button class="btn-action" id="p2-btn" onclick="handleRoll('p2')" disabled>Wait</button>
+            </div>
+
+            <!-- Player 1: Green -->
+            <div class="player-card card-green active-turn" id="p1-card">
+                <div class="player-header">
+                    <div class="player-avatar" style="background: #00ff6a;"></div>
+                    <span>Green Player</span>
+                    <span class="kill-indicator" id="p1-kill"
+                        style="display:none; color: #ffeb3b; margin-left: auto;"><i
+                            class="fa-solid fa-skull-crossbones"></i></span>
+                </div>
+                <div class="player-dice-area">
+                    <div class="mini-dice" id="p1-d1">?</div>
+                    <div class="mini-dice" id="p1-d2">?</div>
+                </div>
+                <div class="roll-buffer" id="p1-buffer">
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                </div>
+                <button class="btn-action" id="p1-btn" onclick="handleRoll('p1')">Roll</button>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             5. THAYAM BOARD GRID
+             ========================================== -->
+        <!-- CENTER BOARD -->
+        <div class="board-container">
+            <div class="board">
+                <!-- BASES -->
+                <div class="start-base base-tl">
+                    <div class="token-slot">
+                        <div class="token token-blue" id="t-p2-1"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-blue" id="t-p2-2"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-blue" id="t-p2-3"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-blue" id="t-p2-4"></div>
+                    </div>
+                </div>
+
+                <div class="start-base base-tr">
+                    <div class="token-slot">
+                        <div class="token token-yellow" id="t-p3-1"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-yellow" id="t-p3-2"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-yellow" id="t-p3-3"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-yellow" id="t-p3-4"></div>
+                    </div>
+                </div>
+
+                <div class="start-base base-bl">
+                    <div class="token-slot">
+                        <div class="token token-green" id="t-p1-1"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-green" id="t-p1-2"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-green" id="t-p1-3"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-green" id="t-p1-4"></div>
+                    </div>
+                </div>
+
+                <div class="start-base base-br">
+                    <div class="token-slot">
+                        <div class="token token-red" id="t-p4-1"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-red" id="t-p4-2"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-red" id="t-p4-3"></div>
+                    </div>
+                    <div class="token-slot">
+                        <div class="token token-red" id="t-p4-4"></div>
+                    </div>
+                </div>
+
+                <!-- Top Arm (Rows 1-6, Cols 7-9) -->
+                <div class="top-arm">
+                    <div class="cell" id="c-0-2"></div>
+                    <div class="cell" id="c-0-1"><i class="fa-solid fa-star"></i></div>
+                    <div class="cell hi-top" id="c-0-0"></div>
+                    <div class="cell" id="c-1-2"></div>
+                    <div class="cell" id="c-1-1"></div>
+                    <div class="cell" id="c-1-0"></div>
+                    <div class="cell" id="c-2-2"></div>
+                    <div class="cell" id="c-2-1"></div>
+                    <div class="cell" id="c-2-0"></div>
+                    <div class="cell" id="c-3-2"></div>
+                    <div class="cell" id="c-3-1"></div>
+                    <div class="cell" id="c-3-0"></div>
+                    <div class="cell" id="c-4-2"></div>
+                    <div class="cell" id="c-4-1"></div>
+                    <div class="cell" id="c-4-0"></div>
+                    <div class="cell" id="c-5-2"></div>
+                    <div class="cell" id="c-5-1"><i class="fa-solid fa-star"></i></div>
+                    <div class="cell" id="c-5-0"></div>
+                </div>
+
+                <!-- Left Arm (Rows 7-9, Cols 1-6) -->
+                <div class="left-arm">
+                    <div class="cell hi-left" id="c-6-0"></div>
+                    <div class="cell" id="c-6-1"></div>
+                    <div class="cell" id="c-6-2"></div>
+                    <div class="cell" id="c-6-3"></div>
+                    <div class="cell" id="c-6-4"></div>
+                    <div class="cell" id="c-6-5"></div>
+                    <div class="cell" id="c-7-0"><i class="fa-solid fa-star"></i></div>
+                    <div class="cell" id="c-7-1"></div>
+                    <div class="cell" id="c-7-2"></div>
+                    <div class="cell" id="c-7-3"></div>
+                    <div class="cell" id="c-7-4"></div>
+                    <div class="cell" id="c-7-5"><i class="fa-solid fa-star"></i></div>
+                    <div class="cell" id="c-8-0"></div>
+                    <div class="cell" id="c-8-1"></div>
+                    <div class="cell" id="c-8-2"></div>
+                    <div class="cell" id="c-8-3"></div>
+                    <div class="cell" id="c-8-4"></div>
+                    <div class="cell" id="c-8-5"></div>
+                </div>
+
+                <div class="center-home" id="center-home">
+                    <!-- Row 1 -->
+                    <div class="hm-c hm-x"></div>
+                    <div class="hm-c hm-y" data-color="yellow"></div>
+                    <div class="hm-c hm-y" data-color="yellow"></div>
+                    <div class="hm-c hm-y" data-color="yellow"></div>
+                    <div class="hm-c hm-x"></div>
+                    <!-- Row 2 -->
+                    <div class="hm-c hm-b" data-color="blue"></div>
+                    <div class="hm-c hm-x"></div>
+                    <div class="hm-c hm-y" data-color="yellow"></div>
+                    <div class="hm-c hm-x"></div>
+                    <div class="hm-c hm-r" data-color="red"></div>
+                    <!-- Row 3 -->
+                    <div class="hm-c hm-b" data-color="blue"></div>
+                    <div class="hm-c hm-b" data-color="blue"></div>
+                    <div class="hm-c hm-x"></div>
+                    <div class="hm-c hm-r" data-color="red"></div>
+                    <div class="hm-c hm-r" data-color="red"></div>
+                    <!-- Row 4 -->
+                    <div class="hm-c hm-b" data-color="blue"></div>
+                    <div class="hm-c hm-x"></div>
+                    <div class="hm-c hm-g" data-color="green"></div>
+                    <div class="hm-c hm-x"></div>
+                    <div class="hm-c hm-r" data-color="red"></div>
+                    <!-- Row 5 -->
+                    <div class="hm-c hm-x"></div>
+                    <div class="hm-c hm-g" data-color="green"></div>
+                    <div class="hm-c hm-g" data-color="green"></div>
+                    <div class="hm-c hm-g" data-color="green"></div>
+                    <div class="hm-c hm-x"></div>
+                </div>
+
+                <!-- Right Arm (Row 6-8, Col 9-14) -->
+                <div class="right-arm">
+                    <div class="cell" id="c-6-9"></div>
+                    <div class="cell" id="c-6-10"></div>
+                    <div class="cell" id="c-6-11"></div>
+                    <div class="cell" id="c-6-12"></div>
+                    <div class="cell" id="c-6-13"></div>
+                    <div class="cell" id="c-6-14"></div>
+                    <div class="cell" id="c-7-9"><i class="fa-solid fa-star"></i></div>
+                    <div class="cell" id="c-7-10"></div>
+                    <div class="cell" id="c-7-11"></div>
+                    <div class="cell" id="c-7-12"></div>
+                    <div class="cell" id="c-7-13"></div>
+                    <div class="cell" id="c-7-14"><i class="fa-solid fa-star"></i></div>
+                    <div class="cell" id="c-8-9"></div>
+                    <div class="cell" id="c-8-10"></div>
+                    <div class="cell" id="c-8-11"></div>
+                    <div class="cell" id="c-8-12"></div>
+                    <div class="cell" id="c-8-13"></div>
+                    <div class="cell hi-right" id="c-8-14"></div>
+                </div>
+
+                <!-- Bottom Arm (Row 9-14) -->
+                <div class="bottom-arm">
+                    <div class="cell" id="c-9-2"></div>
+                    <div class="cell" id="c-9-1"><i class="fa-solid fa-star"></i></div>
+                    <div class="cell" id="c-9-0"></div>
+                    <div class="cell" id="c-10-2"></div>
+                    <div class="cell" id="c-10-1"></div>
+                    <div class="cell" id="c-10-0"></div>
+                    <div class="cell" id="c-11-2"></div>
+                    <div class="cell" id="c-11-1"></div>
+                    <div class="cell" id="c-11-0"></div>
+                    <div class="cell" id="c-12-2"></div>
+                    <div class="cell" id="c-12-1"></div>
+                    <div class="cell" id="c-12-0"></div>
+                    <div class="cell" id="c-13-2"></div>
+                    <div class="cell" id="c-13-1"></div>
+                    <div class="cell" id="c-13-0"></div>
+                    <div class="cell hi-bottom" id="c-14-2"></div>
+                    <div class="cell" id="c-14-1"><i class="fa-solid fa-star"></i></div>
+                    <div class="cell" id="c-14-0"></div>
+                </div>
+
+                <div class="cell tab-tl" id="tab-tl"><i class="fa-solid fa-star"></i></div>
+                <div class="cell tab-tr" id="tab-tr"><i class="fa-solid fa-star"></i></div>
+                <div class="cell tab-bl" id="tab-bl"><i class="fa-solid fa-star"></i></div>
+                <div class="cell tab-br" id="tab-br"><i class="fa-solid fa-star"></i></div>
+
+            </div>
+        </div>
+
+        <!-- Right Panel: Yellow (Top) & Red (Bottom) -->
+        <div class="side-panel right-panel">
+            <!-- Player 3: Yellow -->
+            <div class="player-card card-yellow" id="p3-card">
+                <div class="player-header">
+                    <div class="player-avatar" style="background: #ffcc00;"></div>
+                    <span>Yellow Player</span>
+                    <span class="kill-indicator" id="p3-kill"
+                        style="display:none; color: #ffeb3b; margin-left: auto;"><i
+                            class="fa-solid fa-skull-crossbones"></i></span>
+                </div>
+                <div class="player-dice-area">
+                    <div class="mini-dice" id="p3-d1">?</div>
+                    <div class="mini-dice" id="p3-d2">?</div>
+                </div>
+                <div class="roll-buffer" id="p3-buffer">
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                </div>
+                <button class="btn-action" id="p3-btn" onclick="handleRoll('p3')" disabled>Wait</button>
+            </div>
+
+            <!-- Player 4: Red -->
+            <div class="player-card card-red" id="p4-card">
+                <div class="player-header">
+                    <div class="player-avatar" style="background: #ff1900;"></div>
+                    <span>Red Player</span>
+                    <span class="kill-indicator" id="p4-kill"
+                        style="display:none; color: #ffeb3b; margin-left: auto;"><i
+                            class="fa-solid fa-skull-crossbones"></i></span>
+                </div>
+                <div class="player-dice-area">
+                    <div class="mini-dice" id="p4-d1">?</div>
+                    <div class="mini-dice" id="p4-d2">?</div>
+                </div>
+                <div class="roll-buffer" id="p4-buffer">
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                    <div class="slot"></div>
+                </div>
+                <button class="btn-action" id="p4-btn" onclick="handleRoll('p4')" disabled>Wait</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         6. SCRIPTS & LOGIC
+         ========================================== -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
